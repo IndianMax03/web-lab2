@@ -1,0 +1,128 @@
+/* Табличная вёрстка */
+#layout {
+    width: 100%;
+    height: 650px;
+}
+
+/* Центрирование, отлипание столбцов от ячеек, выравнивание содержимого ячеек */
+td {
+    padding: 18.5px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* Шапка сайта (столбец): высота, выравнивание содержимого, центрирование текста */
+#cap {
+    height: 20px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* Шапка сайта (блок с текстом): настройка шрифта */
+#capBlock {
+    font-family: monospace;
+    font-size: 34px;
+    color: black;
+}
+
+/* Основные данные (столбец): высота, ширина */
+#data {
+    height: 600px;
+    width: 650px;
+}
+
+/* Табличная вёрстка данных (X, Y, R): занимаемая область */
+#dataTable {
+    width: 100%;
+    height: 90%;
+}
+
+/* Кнопка отправки формы: тени + высота + округление границ */
+#accButton {
+    box-shadow: 3px 3px 10px 2px black;
+    height: 50px;
+    border-radius: 10px 10px;
+    font-weight: bold;
+}
+
+/* Кнопка нажата: тени убираются (эффект нажатия на объемную кнопку) */
+#accButton:active {
+    box-shadow: none;
+}
+
+/* Кнопка недоступна: отсутствие теней + серый цвет */
+#accButton:disabled {
+    box-shadow: none;
+    color: gray;
+}
+
+/* Классы radio-button'ов жадный компоновщик + настройка длины кнопок отступами */
+.radioX, .radioR {
+    display: grid;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+/* Radio-button из кружочка в блок (отключение дисплея) */
+.radioX input[type=radio], .radioR input[type=radio] {
+    display: none;
+}
+
+/* Параметры радио кнопок и меток при нажатии */
+.radioX input[type=radio]:checked + label, .radioR input[type=radio]:checked + label {
+    background: #1582ff;
+    color: aliceblue;
+    box-shadow: none;
+}
+/* Параметры кнопок при наведении на них курсором */
+.radioX label:hover, .radioR label:hover {
+    background: #4a7692;
+    color: aliceblue;
+}
+
+/* Настройка меток для радио кнопок */
+.radioX label, .radioR label {
+    display: inline-block;
+    cursor: pointer;
+    line-height: 40px;
+    border: 0.5px solid rgb(0, 0, 0);
+    border-radius: 15px;
+    user-select: none;
+    box-shadow: 2px 2px 3px rgb(0, 0, 0);
+}
+
+/* Настройка расстояния между радио кнопками радиуса (чтобы выровнять блок X и R по высоте) */
+.radioR {
+    margin: 18px;
+}
+
+/* Настройка поля ввода для координаты Y */
+#yText {
+    margin-block-start: 10px;
+    border-width: 2px;
+    border-radius: 10px;
+    border-color: black;
+}
+
+/* Поведение поля ввода координаты Y при получении фокуса */
+#yText:focus {
+    background-color: #1582ff;
+}
+
+/* Описание строк, фиксирующих ошибку при вводе координаты Y и при отправке незаполненной формы соответственно */
+#yNameError, #sendingError {
+    display: block;
+    text-decoration: overline;
+    height: 6px;
+    color: red;
+}
+
+/* График (картинка) */
+#graphImg {
+    border: 3px solid #000000;
+}
+
+/* Настройка текста, описывающего график */
+#imgLabel {
+    font-size: 30px;
+}

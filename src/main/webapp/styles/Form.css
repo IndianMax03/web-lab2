@@ -1,0 +1,30 @@
+/* Табличная вёрстка страницы ответа */
+#layout {
+    width: 100%;
+    height: 700px;
+}
+
+/* Таблица данных */
+#dataTable {
+    width: 100%;
+    height: 30%;
+    border-spacing: 9px 7px;
+}
+
+/* Заголовок таблицы данных */
+#capRow {
+    background-color: #1582ff;
+    color: aliceblue;
+}
+
+/* Строки и столбцы таблицы данных (отступы, границы, тени) */
+#dataTable tr td {
+    padding: 5px;
+    border: 1px solid black;
+    box-shadow: 2px 2px 3px rgb(0, 0, 0);
+}
+
+/* Строки и столбцы таблицы данных (пропадание тени при наведении: эффект объёма) */
+#dataTable tr:hover td:hover {
+    box-shadow: none;
+}
