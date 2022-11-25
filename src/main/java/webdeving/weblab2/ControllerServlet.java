@@ -1,12 +1,18 @@
 package webdeving.weblab2;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * Определяет тип запроса, и, в зависимости от того, содержит ли запрос информацию о координатах точки и радиусе,
@@ -17,20 +23,41 @@ import java.io.PrintWriter;
 @WebServlet(name = "controllerServlet", value = "/controller-servlet")
 public class ControllerServlet extends HttpServlet {
 
-    public void init() {
+    private final Gson gsonInterpreter = new GsonBuilder().setPrettyPrinting().create();
 
+    public void init() throws ServletException {
+        super.init();
+    }
+
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.service(req, resp);
+        if (req.getSession().getAttribute("hits") == null) {
+            req.getSession().setAttribute("hits", new ArrayList<String>());
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        PrintWriter out = res.getWriter();
+        out.write(gsonInterpreter.toJson(req.getSession().getAttribute("hits")));
+        req.getRequestDispatcher("/bad-method-servlet").forward(req, res);
+        out.close();
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType("text/html");
 
+        final String xCoordinate = request.getParameter("xCoordinate");
+        final String yCoordinate = request.getParameter("yCoordinate");
+        final String radius = request.getParameter("radius");
 
-        request.getRequestDispatcher("./area-check-servlet").forward(request, response);
+        if (xCoordinate == null || yCoordinate == null || radius == null) {
+            request.getRequestDispatcher("bad-request-servlet").forward(request, response);
+        } else {
+            request.getRequestDispatcher("/area-check-servlet").forward(request, response);
+        }
 
-        // Hello
-        PrintWriter out = response.getWriter();
-        out.println("<html><body>redirecting...");
-        out.println("</body></html>");
     }
 
     public void destroy() {

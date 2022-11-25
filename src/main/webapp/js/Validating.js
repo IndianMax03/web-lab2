@@ -1,33 +1,108 @@
 const min = -5;
-const max = 3;
+const max = 5;
 
-qS("#yText").oninput = revalidateAns;
-qS("#yText").onchange = revalidateAns;
-let ans;
+qS("#yText").oninput = revalidateY;
+qS("#yText").onchange = revalidateY;
 
-function revalidateAns() {
-    ans = validateY();
-    qS("#yNameError").textContent = ans;
+function revalidateY() {
+    changeY(validateY());
 }
 
+$(".xBtn:checkbox").change(() => {
+    changeX(validateX());
+});
+
+$(".rBtn:checkbox").change(() => {
+    changeR(validateR());
+});
+
 el("mainForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+
     let yAns = validateY();
     let xAns = validateX();
     let rAns = validateR();
-    let answer = (yAns + xAns + rAns !== "" ? "Ошибка отправки: " : "") +
-        (yAns === "" ? yAns : yAns + "; ") +
-        (xAns === "" ? xAns : xAns + "; ") +
-        (rAns === "" ? rAns : rAns + "; ");
-    qS("#sendingError").textContent = answer;
-    if (answer.length > 0) {
-        e.preventDefault();
+
+    let answer = changeY(yAns) + changeX(xAns) + changeR(rAns);
+
+    if (!(answer.length > 0)) {
+        $.ajax({
+            type: "GET",
+            url: "./controller-servlet",
+            data: {
+                xCoordinate: getX(),
+                yCoordinate: getY(),
+                radius: getR()
+            },
+            success: function (response) {
+                let gsonHits = JSON.parse(response);
+                fillGraph(gsonHits);
+                updateTable(gsonHits);
+            }
+        })
     }
 });
 
+function updateTable(gsonHits) {
+    // let obj = JSON.parse(gsonHits);
+    // console.log(obj);
+    $('#dataTable tr:last').after(
+        `<tr> " +
+        "<td>${gsonHits.X_VALUE}</td> " +
+        "<td>${gsonHits.Y_VALUE}</td> " +
+        "<td>${gsonHits.R_VALUE}</td> " +
+        "<td>${gsonHits.HIT}</td> " +
+        "<td>${gsonHits.EXECUTION_TIME}</td> " +
+        "<td>${gsonHits.CURRENT_TIME}</td> " +
+        "</tr>`
+    );
+}
+
+function fillGraph(gsonHits) {
+    for (let i = 0; i < gsonHits.length; i++) {
+        let obj = JSON.parse(gsonHits[i]);
+        board.create('point', [obj.x, obj.y], {name: '', size: 2, fixed: true});
+    }
+}
+
+function changeY(yAns) {
+    if (yAns !== "") {
+        qS("#yError").innerHTML = yAns;
+        qS("#yErrDialog").style.background = "crimson";
+    } else {
+        qS("#yError").innerHTML = getY();
+        qS("#yErrDialog").style.background = "greenyellow";
+    }
+    return yAns;
+}
+
+function changeX(xAns) {
+    if (xAns !== "") {
+        qS("#xError").innerHTML = xAns;
+        qS("#xErrDialog").style.background = "crimson";
+    } else {
+        qS("#xError").innerHTML = getX();
+        qS("#xErrDialog").style.background = "greenyellow";
+    }
+    return xAns;
+}
+
+function changeR(rAns) {
+    if (rAns !== "") {
+        qS("#rError").innerHTML = rAns;
+        qS("#rErrDialog").style.background = "crimson";
+        qS("canvas").classList.remove("cursor");
+    } else {
+        qS("#rError").innerHTML = getR();
+        qS("#rErrDialog").style.background = "greenyellow";
+        qS("canvas").classList.add("cursor");
+    }
+    return rAns;
+}
+
 function validateY() {
 
-    let y = qS("#yText").value;
-    console.log(y);
+    let y = getY();
 
     if (y.replace(/\s/g, "") === "" || y === "") {
         return "Y не может быть пустым";
@@ -49,14 +124,7 @@ function validateY() {
 }
 
 function validateX() {
-    let xSet = elByClassname("xBtn");
-    let x;
-    for (let i = 0; i < xSet.length; i++) {
-        if (xSet[i].checked) {
-            x = xSet[i].value;
-            break;
-        }
-    }
+    let x = getX();
     if (isNaN(x)) {
         return "Не выбран X";
     } else {
@@ -65,6 +133,31 @@ function validateX() {
 }
 
 function validateR() {
+    let r = getR();
+    if (isNaN(r)) {
+        return "Не выбран R";
+    } else {
+        return "";
+    }
+}
+
+function getX() {
+    let xSet = elByClassname("xBtn");
+    let x;
+    for (let i = 0; i < xSet.length; i++) {
+        if (xSet[i].checked) {
+            x = xSet[i].value;
+            break;
+        }
+    }
+    return x;
+}
+
+function getY() {
+    return qS("#yText").value;
+}
+
+function getR() {
     let rSet = elByClassname("rBtn");
     let r;
     for (let i = 0; i < rSet.length; i++) {
@@ -73,11 +166,7 @@ function validateR() {
             break;
         }
     }
-    if (isNaN(r)) {
-        return "Не выбран R";
-    } else {
-        return "";
-    }
+    return r;
 }
 
 function qS(element) {

@@ -1,11 +1,18 @@
 package webdeving.weblab2;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import webdeving.weblab2.businessLogic.CannotValidateException;
+import webdeving.weblab2.businessLogic.ParamsValidator;
+
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * Осуществляет проверку попадания точки в область на координатной плоскости и формирует HTML-страницу с результатами
@@ -13,21 +20,42 @@ import java.io.PrintWriter;
  * */
 @WebServlet(name = "areaCheckServlet", value = "/area-check-servlet")
 public class AreaCheckServlet extends HttpServlet {
-    public void init() {
 
+    private final Gson gsonInterpreter = new GsonBuilder().setPrettyPrinting().create();
+
+    public void init() throws ServletException {
+        super.init();
+    }
+
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.service(req, resp);
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        long start = System.nanoTime();
         response.setContentType("text/html");
 
-
-
-        // Hello
         PrintWriter out = response.getWriter();
-        out.println("<html><body>iuuuuuuuuuuuuuuu");
-        out.println("</body></html>");
+
+        final String xCoordinate = request.getParameter("xCoordinate");
+        final String yCoordinate = request.getParameter("yCoordinate");
+        final String radius = request.getParameter("radius");
+
+        try {
+            ParamsValidator paramsValidator = new ParamsValidator(xCoordinate, yCoordinate, radius, start);
+            out.println(gsonInterpreter.toJson(paramsValidator));
+//            ArrayList<String> hits = (ArrayList<String>) request.getSession().getAttribute("hits");
+//            hits.add(gsonInterpreter.toJson(paramsValidator));
+
+        } catch (CannotValidateException ex) {
+            out.println(ex.getMessage());
+        }
+
+
     }
 
     public void destroy() {
+        super.destroy();
     }
 }
